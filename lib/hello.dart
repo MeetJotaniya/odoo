@@ -14,9 +14,6 @@ class Hello extends StatelessWidget {
           Center(
             child : Text("Hello World" , style: TextStyle(fontSize: 40),)
           ),
-          Center(
-            child: Text("Jane baylaaaaa" , style: TextStyle(fontSize: 45),),
-          )
         ],
       ),
     );
