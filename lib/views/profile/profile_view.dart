@@ -4,7 +4,6 @@ import '../../constants/text_styles.dart';
 import '../../models/user_profile.dart';
 import '../../services/auth_service.dart';
 import '../../services/database_service.dart';
- // Added import for SwapRequestsScreen
 import '../swap_requests/swap_requests_screen.dart';
 class ProfileView extends StatefulWidget {
   final UserProfile profile;

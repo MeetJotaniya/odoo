@@ -4,6 +4,7 @@ import 'constants/colors.dart';
 import 'views/home_screen.dart';
 import 'views/auth/login_screen.dart';
 import 'views/auth/register_screen.dart';
+import 'views/splash_screen.dart';
 void main() {
   runApp(const SkillSwapApp());
 }
@@ -28,11 +29,12 @@ class SkillSwapApp extends StatelessWidget {
           secondary: AppColors.secondary,
         ),
       ),
-      home: HomeScreen(),
+      home: const SplashScreen(),
       routes: {
         '/home': (context) => HomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
+        '/splash': (context) => const SplashScreen(),
       },
     );
   }
