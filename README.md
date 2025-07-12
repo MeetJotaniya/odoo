@@ -1,16 +1,17 @@
-# odoo_try
+# odoo
 
-A new Flutter project.
+Team Name : 404 Brain Not found
 
-## Getting Started
+problem statement -1 Skill Swap Platform
 
-This project is a starting point for a Flutter application.
+Name: Vidisha Bhagiya (Leader)
+Email: vidishabhagiya29@gmail.com
 
-A few resources to get you started if this is your first Flutter project:
+Name : Jotaniya Meet 
+Email : meetjotaniya07@gmail.com 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Name : Yash virsodiya 
+Email: virsodiyayash4@gmail.com 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Name : Ayushi Patel 
+Email: ayushipatel1229@gmail.com 
