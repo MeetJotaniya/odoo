@@ -149,7 +149,7 @@ class ProfileCard extends StatelessWidget {
                     minimumSize: const Size(0, 28),
                     textStyle: AppTextStyles.button.copyWith(fontSize: 13),
                   ),
-                  child: const Text('Request'),
+                  child: const Text('Request' , style: TextStyle(color: Colors.white),),
                 ),
               ),
             ],
