@@ -25,6 +25,7 @@ class UserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.accent,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
@@ -104,7 +105,8 @@ class UserProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(),
+            // const Spacer(),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
             Center(
               child: SizedBox(
                 width: double.infinity,
