@@ -1,4 +1,5 @@
 class UserProfile {
+  final int? id;
   final String name;
   final String? location;
   final String? profilePhotoUrl;
@@ -9,6 +10,7 @@ class UserProfile {
   final double rating;
 
   UserProfile({
+    this.id,
     required this.name,
     this.location,
     this.profilePhotoUrl,

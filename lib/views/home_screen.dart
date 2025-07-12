@@ -5,7 +5,9 @@ import '../constants/colors.dart';
 import '../constants/text_styles.dart';
 import '../controllers/home_controller.dart';
 import '../services/auth_service.dart';
+import '../services/swap_service.dart';
 import '../models/user_profile.dart';
+import '../models/swap_request_model.dart';
 import 'widgets/profile_card.dart';
 import 'profile/profile_view.dart';
 import 'auth/login_screen.dart';
@@ -21,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final HomeController _controller = HomeController();
   final AuthService _authService = AuthService();
+  final SwapService _swapService = SwapService();
   String _searchQuery = '';
   int _currentPage = 1;
   final int _profilesPerPage = 2;
@@ -58,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onRequest(UserProfile profile) {
+  void _onRequest(UserProfile profile) async {
     // Check if user is logged in
     if (!_authService.checkLoginStatus()) {
       // Show login dialog
@@ -67,9 +70,58 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     
     // User is logged in, proceed with request
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Request sent to ${profile.name}')),
-    );
+    try {
+      final currentUser = _authService.currentUser;
+      if (currentUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User not found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Get the target user's skills
+      final targetUserSkills = profile.skillsWanted.isNotEmpty 
+          ? profile.skillsWanted.first 
+          : 'Python Programming';
+      
+      // Get current user's skills
+      final currentUserSkills = _getSkillsForUser(currentUser.skillsOfferedId).isNotEmpty
+          ? _getSkillsForUser(currentUser.skillsOfferedId).first
+          : 'Web Development';
+
+      final success = await _swapService.createSwapRequest(
+        fromUserId: currentUser.id!,
+        toUserId: profile.id ?? 1, // Use the profile's ID
+        offeredSkills: currentUserSkills,
+        requestedSkills: targetUserSkills,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Request sent to ${profile.name}'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to send request'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error sending request'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showLoginDialog() {
@@ -127,6 +179,41 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List<String> _getSkillsForUser(int? skillId) {
+    // This would be enhanced to get actual skills from database
+    // For now, return default skills based on ID
+    if (skillId == null) return ['Web Development'];
+    
+    final skills = [
+      'Web Development',
+      'App Development',
+      'Python Programming',
+      'Java Programming',
+      'Database Management',
+      'Cybersecurity Basics',
+      'DSA',
+      'Machine Learning',
+      'Data Analysis',
+      'Git and Github',
+      'Excel, PowerPoint and Word',
+    ];
+    
+    // Ensure skillId is within bounds
+    final index = (skillId - 1) % skills.length;
+    return [skills[index >= 0 ? index : 0]];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfiles();
+  }
+
+  Future<void> _loadProfiles() async {
+    await _controller.loadProfiles();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,18 +253,49 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.person, color: AppColors.primary),
             ),
             onPressed: () {
-              // Navigate to profile page with smooth animation
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 400),
-                  pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
-                    opacity: animation,
-                    child: ProfileView(
-                      profile: _controller.allProfiles.first, // Use the first profile as mock
+              // Check if user is logged in
+              if (!_authService.checkLoginStatus()) {
+                _showLoginDialog();
+                return;
+              }
+              
+              // Get current user's profile
+              final currentUser = _authService.currentUser;
+              if (currentUser != null) {
+                final userProfile = UserProfile(
+                  id: currentUser.id,
+                  name: currentUser.name,
+                  location: currentUser.location,
+                  profilePhotoUrl: currentUser.profilePhoto,
+                  skillsOffered: _getSkillsForUser(currentUser.skillsOfferedId),
+                  skillsWanted: _getSkillsForUser(currentUser.skillsWantedId),
+                  availability: 'Weekends', // Default availability
+                  isPublic: currentUser.privacy,
+                  rating: 4.5, // Default rating
+                );
+                
+                // Navigate to profile page with smooth animation
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 400),
+                    pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                      opacity: animation,
+                      child: ProfileView(
+                        profile: userProfile,
+                        onSave: (updatedProfile) {
+                          // Handle profile updates here
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Profile updated successfully!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              );
+                );
+              }
             },
           ),
           const SizedBox(width: 12),
