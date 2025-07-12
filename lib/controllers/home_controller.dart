@@ -20,13 +20,20 @@ class HomeController {
   }
 
   UserProfile _convertUserToProfile(User user) {
+    // Use the new comma-separated string fields if present
+    List<String> offered = user.skillsOfferedStr != null && user.skillsOfferedStr!.isNotEmpty
+      ? user.skillsOfferedStr!.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList()
+      : _getSkillsForUser(user.skillsOfferedId);
+    List<String> wanted = user.skillsWantedStr != null && user.skillsWantedStr!.isNotEmpty
+      ? user.skillsWantedStr!.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList()
+      : _getSkillsForUser(user.skillsWantedId);
     return UserProfile(
       id: user.id,
       name: user.name,
       location: user.location,
       profilePhotoUrl: user.profilePhoto,
-      skillsOffered: _getSkillsForUser(user.skillsOfferedId),
-      skillsWanted: _getSkillsForUser(user.skillsWantedId),
+      skillsOffered: offered,
+      skillsWanted: wanted,
       availability: 'Weekends', // Default availability
       isPublic: user.privacy,
       rating: 4.5, // Default rating

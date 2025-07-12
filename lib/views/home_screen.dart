@@ -11,6 +11,8 @@ import '../models/swap_request_model.dart';
 import 'widgets/profile_card.dart';
 import 'profile/profile_view.dart';
 import 'auth/login_screen.dart';
+import 'swap_requests/swap_requests_screen.dart';
+import 'profile/request_form_user_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -28,8 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 1;
   final int _profilesPerPage = 2;
 
+  // Add a list to store added users (for demo)
+  final List<UserProfile> _addedUsers = [];
+
   List<UserProfile> get _filteredProfiles =>
-      _controller.filterProfiles(_searchQuery);
+      [..._controller.filterProfiles(_searchQuery), ..._addedUsers.where((u) => u.name.toLowerCase().contains(_searchQuery.toLowerCase()))];
 
   List<UserProfile> get _paginatedProfiles {
     final start = (_currentPage - 1) * _profilesPerPage;
@@ -64,64 +69,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onRequest(UserProfile profile) async {
     // Check if user is logged in
     if (!_authService.checkLoginStatus()) {
-      // Show login dialog
       _showLoginDialog();
       return;
     }
-    
-    // User is logged in, proceed with request
-    try {
-      final currentUser = _authService.currentUser;
-      if (currentUser == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('User not found'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      // Get the target user's skills
-      final targetUserSkills = profile.skillsWanted.isNotEmpty 
-          ? profile.skillsWanted.first 
-          : 'Python Programming';
-      
-      // Get current user's skills
-      final currentUserSkills = _getSkillsForUser(currentUser.skillsOfferedId).isNotEmpty
-          ? _getSkillsForUser(currentUser.skillsOfferedId).first
-          : 'Web Development';
-
-      final success = await _swapService.createSwapRequest(
-        fromUserId: currentUser.id!,
-        toUserId: profile.id ?? 1, // Use the profile's ID
-        offeredSkills: currentUserSkills,
-        requestedSkills: targetUserSkills,
-      );
-
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Request sent to ${profile.name}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to send request'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error sending request'),
-          backgroundColor: Colors.red,
+    // Navigate to the request form page, passing skills
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RequestFormScreen(
+          yourSkills: profile.skillsOffered,
+          theirSkills: profile.skillsWanted,
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _showLoginDialog() {
@@ -282,14 +242,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       opacity: animation,
                       child: ProfileView(
                         profile: userProfile,
-                        onSave: (updatedProfile) {
-                          // Handle profile updates here
+                        onSave: (updatedProfile) async {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Profile updated successfully!'),
                               backgroundColor: Colors.green,
                             ),
                           );
+                          await _loadProfiles();
+                          setState(() {});
                         },
                       ),
                     ),

@@ -3,6 +3,9 @@ import '../../constants/colors.dart';
 import '../../constants/text_styles.dart';
 import '../../services/auth_service.dart';
 import 'register_screen.dart';
+import '../profile/profile_view.dart'; // Added import for ProfileView
+import '../../models/user_profile.dart'; // Added import for UserProfile
+import '../admin/admin_dashboard_view.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -122,20 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: Column(
                   children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(
-                        Icons.swap_horiz,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
                     Text(
                       'Welcome Back',
                       style: AppTextStyles.heading.copyWith(

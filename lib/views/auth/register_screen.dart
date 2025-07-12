@@ -49,6 +49,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
+      final existingUser = await _authService.getUserByEmail(_emailController.text);
+      if (existingUser != null) {
+        setState(() {
+          _errorMessage = 'Registration failed. Email is already in use.';
+        });
+        return;
+      }
+
       final success = await _authService.register(
         _nameController.text,
         _emailController.text,
@@ -65,8 +73,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         );
       } else {
-        // Do not set _errorMessage for email already in use
-        // Optionally, you can show a snackbar or do nothing
+        setState(() {
+          _errorMessage = 'Registration failed. Please try again.';
+        });
       }
     } catch (e) {
       setState(() {

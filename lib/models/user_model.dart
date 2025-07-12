@@ -9,6 +9,8 @@ class User {
   final DateTime? createdAt;
   final int? skillsOfferedId;
   final int? skillsWantedId;
+  final String? skillsOfferedStr; // comma-separated
+  final String? skillsWantedStr; // comma-separated
 
   User({
     this.id,
@@ -21,6 +23,8 @@ class User {
     this.createdAt,
     this.skillsOfferedId,
     this.skillsWantedId,
+    this.skillsOfferedStr,
+    this.skillsWantedStr,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -37,6 +41,8 @@ class User {
           : null,
       skillsOfferedId: json['Skills_offered'] ?? json['skills_offered'],
       skillsWantedId: json['Skills_wanted'] ?? json['skills_wanted'],
+      skillsOfferedStr: json['Skills_offered_str'],
+      skillsWantedStr: json['Skills_wanted_str'],
     );
   }
 
@@ -52,6 +58,8 @@ class User {
       'Created_at': createdAt?.toIso8601String(),
       'Skills_offered': skillsOfferedId,
       'Skills_wanted': skillsWantedId,
+      'Skills_offered_str': skillsOfferedStr,
+      'Skills_wanted_str': skillsWantedStr,
     };
   }
 
@@ -66,6 +74,8 @@ class User {
     DateTime? createdAt,
     int? skillsOfferedId,
     int? skillsWantedId,
+    String? skillsOfferedStr,
+    String? skillsWantedStr,
   }) {
     return User(
       id: id ?? this.id,
@@ -78,6 +88,8 @@ class User {
       createdAt: createdAt ?? this.createdAt,
       skillsOfferedId: skillsOfferedId ?? this.skillsOfferedId,
       skillsWantedId: skillsWantedId ?? this.skillsWantedId,
+      skillsOfferedStr: skillsOfferedStr ?? this.skillsOfferedStr,
+      skillsWantedStr: skillsWantedStr ?? this.skillsWantedStr,
     );
   }
 }

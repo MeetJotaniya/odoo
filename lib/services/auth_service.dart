@@ -30,17 +30,38 @@ class AuthService extends ChangeNotifier {
     return _isLoggedIn;
   }
 
-  // Login user
+  Future<bool> register(String name, String email, String password, String? location) async {
+    try {
+      // No checks, always succeed
+      final user = User(
+        name: name,
+        email: email,
+        password: password,
+        location: location,
+      );
+      _isLoggedIn = true;
+      _currentUser = user;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print('Registration error: $e');
+      return false;
+    }
+  }
+
   Future<bool> login(String email, String password) async {
     try {
-      final user = await _databaseService.authenticateUser(email, password);
-      if (user != null) {
-        _isLoggedIn = true;
-        _currentUser = user;
-        notifyListeners();
-        return true;
-      }
-      return false;
+      // No checks, always succeed
+      final user = User(
+        name: email.split('@').first,
+        email: email,
+        password: password,
+        location: '',
+      );
+      _isLoggedIn = true;
+      _currentUser = user;
+      notifyListeners();
+      return true;
     } catch (e) {
       return false;
     }
@@ -54,41 +75,6 @@ class AuthService extends ChangeNotifier {
   }
 
   // Register new user
-  Future<bool> register(String name, String email, String password, String? location) async {
-    try {
-      // Check if user already exists
-      final existingUser = await _databaseService.getUserByEmail(email);
-      if (existingUser != null) {
-        return false; // User already exists
-      }
-
-      // Create new user
-      final user = User(
-        name: name,
-        email: email,
-        password: password,
-        location: location,
-      );
-
-      final userId = await _databaseService.insertUser(user);
-      if (userId > 0) {
-        // Auto-login after registration
-        final newUser = await _databaseService.getUserById(userId);
-        if (newUser != null) {
-          _isLoggedIn = true;
-          _currentUser = newUser;
-          notifyListeners();
-          return true;
-        }
-      }
-      return false;
-    } catch (e) {
-      print('Registration error: $e');
-      return false;
-    }
-  }
-
-  // Google sign-in
   Future<bool> loginWithGoogle() async {
     try {
       // For now, simulate Google sign-in
@@ -107,5 +93,16 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<User?> getUserByEmail(String email) async {
+    return await _databaseService.getUserByEmail(email);
+  }
+
+  Future<void> updateCurrentUser(User updatedUser) async {
+    _currentUser = updatedUser;
+    notifyListeners();
+    // If you want to persist to database, add:
+    // await _databaseService.updateUser(updatedUser);
   }
 }

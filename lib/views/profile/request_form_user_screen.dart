@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../constants/colors.dart';
 import '../../constants/text_styles.dart';
+import '../../services/swap_service.dart';
+import '../../services/auth_service.dart';
 
 class RequestFormScreen extends StatefulWidget {
   final List<String> yourSkills;
@@ -25,6 +27,7 @@ class _RequestFormScreen5State extends State<RequestFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.accent,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         title: const Text(
@@ -32,7 +35,7 @@ class _RequestFormScreen5State extends State<RequestFormScreen> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +105,7 @@ class _RequestFormScreen5State extends State<RequestFormScreen> {
                 contentPadding: const EdgeInsets.all(12),
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -114,11 +117,34 @@ class _RequestFormScreen5State extends State<RequestFormScreen> {
                   ),
                 ),
                 onPressed: (selectedYourSkill != null && selectedTheirSkill != null)
-                    ? () {
-                        // TODO: Handle submit logic
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Request submitted!')),
+                    ? () async {
+                        // Get current user and target user (dummy for now)
+                        final authService = AuthService();
+                        final swapService = SwapService();
+                        final currentUser = authService.currentUser;
+                        if (currentUser == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('You must be logged in.')),
+                          );
+                          return;
+                        }
+                        // For demo, use 2 as the target user ID
+                        final success = await swapService.createSwapRequest(
+                          fromUserId: currentUser.id ?? 1,
+                          toUserId: 2,
+                          offeredSkills: selectedYourSkill!,
+                          requestedSkills: selectedTheirSkill!,
                         );
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Request submitted!')),
+                          );
+                          Navigator.of(context).pop();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Failed to submit request.')),
+                          );
+                        }
                       }
                     : null,
                 child: Text('Submit', style: AppTextStyles.button),

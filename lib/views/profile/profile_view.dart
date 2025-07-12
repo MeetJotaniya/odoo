@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import '../../constants/colors.dart';
 import '../../constants/text_styles.dart';
 import '../../models/user_profile.dart';
-
+import '../../services/auth_service.dart';
+import '../../services/database_service.dart';
+ // Added import for SwapRequestsScreen
+import '../swap_requests/swap_requests_screen.dart';
 class ProfileView extends StatefulWidget {
   final UserProfile profile;
   final void Function(UserProfile updatedProfile)? onSave;
@@ -19,6 +22,10 @@ class _ProfileViewState extends State<ProfileView> {
   late bool _isPublic;
   late List<String> _skillsOffered;
   late List<String> _skillsWanted;
+  late String _originalName;
+  late String _originalLocation;
+  late String _originalAvailability;
+  late bool _originalIsPublic;
 
   static const List<String> _availabilityOptions = [
     'Weekends',
@@ -44,6 +51,11 @@ class _ProfileViewState extends State<ProfileView> {
     if (_selectedAvailability == 'Custom') {
       _availabilityController.text = widget.profile.availability;
     }
+    // Save originals for discard
+    _originalName = widget.profile.name;
+    _originalLocation = widget.profile.location ?? '';
+    _originalAvailability = widget.profile.availability;
+    _originalIsPublic = widget.profile.isPublic;
   }
 
   @override
@@ -52,80 +64,6 @@ class _ProfileViewState extends State<ProfileView> {
     _locationController.dispose();
     _availabilityController.dispose();
     super.dispose();
-  }
-
-  void _addSkillDialog({required bool offered}) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add Skill'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(hintText: 'Skill name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final skill = controller.text.trim();
-              if (skill.isNotEmpty) {
-                setState(() {
-                  if (offered) {
-                    _skillsOffered.add(skill);
-                  } else {
-                    _skillsWanted.add(skill);
-                  }
-                });
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _editSkillDialog({required bool offered, required int index}) {
-    final controller = TextEditingController(text: offered ? _skillsOffered[index] : _skillsWanted[index]);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Edit Skill'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(hintText: 'Skill name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final skill = controller.text.trim();
-              if (skill.isNotEmpty) {
-                setState(() {
-                  if (offered) {
-                    _skillsOffered[index] = skill;
-                  } else {
-                    _skillsWanted[index] = skill;
-                  }
-                });
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -142,40 +80,91 @@ class _ProfileViewState extends State<ProfileView> {
           child: Row(
             children: [
               TextButton(
-                onPressed: () {
-                  // Save logic: create new UserProfile and call onSave
-                  final updatedProfile = UserProfile(
-                    name: _nameController.text,
-                    location: _locationController.text,
-                    profilePhotoUrl: widget.profile.profilePhotoUrl,
-                    skillsOffered: List<String>.from(_skillsOffered),
-                    skillsWanted: List<String>.from(_skillsWanted),
-                    availability: _selectedAvailability == 'Custom'
-                        ? _availabilityController.text
-                        : _selectedAvailability ?? '',
-                    isPublic: _isPublic,
-                    rating: widget.profile.rating,
-                  );
-                  if (widget.onSave != null) {
-                    widget.onSave!(updatedProfile);
+                onPressed: () async {
+                  // Save logic: update user profile in database
+                  final authService = AuthService();
+                  final user = authService.currentUser;
+                  if (user != null) {
+                    final updatedUser = user.copyWith(
+                      name: _nameController.text,
+                      location: _locationController.text,
+                      privacy: _isPublic,
+                      skillsOfferedStr: _skillsOffered.join(','),
+                      skillsWantedStr: _skillsWanted.join(','),
+                      // Save availability as a string field (add to User model if needed)
+                    );
+                    await authService.updateCurrentUser(updatedUser);
+                    // Also persist to database
+                    await DatabaseService().updateUser(updatedUser);
+                    // Save availability and profile type as original for discard
+                    setState(() {
+                      _originalName = _nameController.text;
+                      _originalLocation = _locationController.text;
+                      _originalAvailability = _selectedAvailability == 'Custom'
+                          ? _availabilityController.text
+                          : _selectedAvailability ?? '';
+                      _originalIsPublic = _isPublic;
+                    });
+                    // Notify parent (e.g. home screen) of update
+                    if (widget.onSave != null) {
+                      widget.onSave!(UserProfile(
+                        id: user.id,
+                        name: _nameController.text,
+                        location: _locationController.text,
+                        profilePhotoUrl: user.profilePhoto,
+                        skillsOffered: _skillsOffered,
+                        skillsWanted: _skillsWanted,
+                        availability: _selectedAvailability == 'Custom' ? _availabilityController.text : _selectedAvailability ?? '',
+                        isPublic: _isPublic,
+                        rating: 4.5, // or user.rating if available
+                      ));
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile saved!')),
+                    );
                   }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Profile saved!')),
-                  );
                 },
                 child: Text('Save', style: AppTextStyles.body.copyWith(color: Colors.green, fontWeight: FontWeight.bold)),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Discard logic: revert changes
+                  setState(() {
+                    _nameController.text = _originalName;
+                    _locationController.text = _originalLocation;
+                    _availabilityController.text = _originalAvailability;
+                    _isPublic = _originalIsPublic;
+                    _selectedAvailability = _availabilityOptions.contains(_originalAvailability)
+                        ? _originalAvailability
+                        : 'Custom';
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Changes discarded.')),
+                  );
+                },
                 child: Text('Discard', style: AppTextStyles.body.copyWith(color: AppColors.secondary, fontWeight: FontWeight.bold)),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text('Swap request', style: AppTextStyles.body.copyWith(decoration: TextDecoration.underline)),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text('Home', style: AppTextStyles.body.copyWith(decoration: TextDecoration.underline)),
+              ),
+              const SizedBox(width: 8),
+              // Swap Requests Button
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SwapRequestsScreen(),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Icon(Icons.swap_horiz, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text('Swap Requests', style: AppTextStyles.body.copyWith(color: AppColors.primary)),
+                  ],
+                ),
               ),
               const SizedBox(width: 8),
               CircleAvatar(
@@ -212,11 +201,115 @@ class _ProfileViewState extends State<ProfileView> {
                         const SizedBox(height: 14),
                         _editableField('Location', _locationController),
                         const SizedBox(height: 14),
-                        Row(
+                        Text('Skills Offered', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
                           children: [
-                            Expanded(child: _skillsSection('Skills Offered', _skillsOffered, true)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _skillsSection('Skills wanted', _skillsWanted, false)),
+                            ..._skillsOffered.asMap().entries.map((entry) {
+                              final i = entry.key;
+                              final skill = entry.value;
+                              return Chip(
+                                label: Text(skill),
+                                deleteIcon: Icon(Icons.close, size: 18),
+                                onDeleted: () {
+                                  setState(() => _skillsOffered.removeAt(i));
+                                },
+                                backgroundColor: AppColors.primary.withOpacity(0.1),
+                                labelStyle: AppTextStyles.body,
+                              );
+                            }),
+                            ActionChip(
+                              label: Row(children: [Icon(Icons.add, size: 16), Text('Add')]),
+                              onPressed: () async {
+                                final controller = TextEditingController();
+                                final result = await showDialog<String>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppColors.accent,
+                                    title: Text('Add Skill Offered', style: AppTextStyles.heading.copyWith(color: AppColors.primary)),
+                                    content: TextField(
+                                      controller: controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'Skill',
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                                        onPressed: () => Navigator.pop(context, controller.text),
+                                        child: Text('Add', style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (result != null && result.trim().isNotEmpty) {
+                                  setState(() => _skillsOffered.add(result.trim()));
+                                }
+                              },
+                              backgroundColor: AppColors.primary.withOpacity(0.15),
+                              labelStyle: AppTextStyles.body,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text('Skills Wanted', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            ..._skillsWanted.asMap().entries.map((entry) {
+                              final i = entry.key;
+                              final skill = entry.value;
+                              return Chip(
+                                label: Text(skill),
+                                deleteIcon: Icon(Icons.close, size: 18),
+                                onDeleted: () {
+                                  setState(() => _skillsWanted.removeAt(i));
+                                },
+                                backgroundColor: AppColors.secondary.withOpacity(0.1),
+                                labelStyle: AppTextStyles.body,
+                              );
+                            }),
+                            ActionChip(
+                              label: Row(children: [Icon(Icons.add, size: 16), Text('Add')]),
+                              onPressed: () async {
+                                final controller = TextEditingController();
+                                final result = await showDialog<String>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppColors.accent,
+                                    title: Text('Add Skill Wanted', style: AppTextStyles.heading.copyWith(color: AppColors.primary)),
+                                    content: TextField(
+                                      controller: controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'Skill',
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                                        onPressed: () => Navigator.pop(context, controller.text),
+                                        child: Text('Add', style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (result != null && result.trim().isNotEmpty) {
+                                  setState(() => _skillsWanted.add(result.trim()));
+                                }
+                              },
+                              backgroundColor: AppColors.secondary.withOpacity(0.15),
+                              labelStyle: AppTextStyles.body,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 14),
@@ -260,40 +353,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _skillsSection(String label, List<String> skills, bool offered) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(width: 6),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, size: 20),
-              color: AppColors.primary,
-              tooltip: 'Add Skill',
-              onPressed: () => _addSkillDialog(offered: offered),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-          ],
-        ),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: List.generate(skills.length, (i) => InputChip(
-            label: Text(skills[i], style: AppTextStyles.body.copyWith(color: offered ? Colors.white : AppColors.primary)),
-            backgroundColor: offered ? AppColors.primary : Colors.white,
-            shape: StadiumBorder(side: BorderSide(color: AppColors.primary)),
-            onDeleted: () => setState(() => skills.removeAt(i)),
-            deleteIcon: const Icon(Icons.close, size: 16),
-            onPressed: () => _editSkillDialog(offered: offered, index: i),
-          )),
-        ),
-      ],
-    );
-  }
-
   Widget _profileTypeDropdown() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -328,19 +387,7 @@ class _ProfileViewState extends State<ProfileView> {
               : null,
         ),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {},
-              child: Text('Add/Edit', style: AppTextStyles.body.copyWith(color: AppColors.primary)),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: Text('Remove', style: AppTextStyles.body.copyWith(color: AppColors.secondary)),
-            ),
-          ],
-        ),
+        // Remove Add/Edit/Remove buttons
       ],
     );
   }
