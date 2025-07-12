@@ -122,7 +122,7 @@
             "name": "Skills_Offered",
             "withoutRowId": false,
             "strict": false,
-            "ddl": "CREATE TABLE Skills_Offered (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES Users (id) ON DELETE CASCADE, skill_name varchar (100) NOT NULL)",
+            "ddl": "CREATE TABLE Skills_Offered (id INTEGER PRIMARY KEY AUTOINCREMENT, skill_name varchar (100) NOT NULL)",
             "columns": [
                 {
                     "name": "id",
@@ -131,20 +131,6 @@
                         {
                             "type": "PRIMARY KEY",
                             "definition": "PRIMARY KEY AUTOINCREMENT"
-                        }
-                    ]
-                },
-                {
-                    "name": "user_id",
-                    "type": "INTEGER",
-                    "constraints": [
-                        {
-                            "type": "NOT NULL",
-                            "definition": "NOT NULL "
-                        },
-                        {
-                            "type": "FOREIGN KEY",
-                            "definition": "REFERENCES Users (id) ON DELETE CASCADE"
                         }
                     ]
                 },
@@ -160,6 +146,46 @@
                 }
             ],
             "rows": [
+                [
+                    1,
+                    "Web Development"
+                ],
+                [
+                    2,
+                    "App Development"
+                ],
+                [
+                    3,
+                    "Python Programming"
+                ],
+                [
+                    4,
+                    "Java Programming"
+                ],
+                [
+                    5,
+                    "Database Management"
+                ],
+                [
+                    6,
+                    "Cybersecurity Basis"
+                ],
+                [
+                    7,
+                    "DSA"
+                ],
+                [
+                    8,
+                    "Machine Learning"
+                ],
+                [
+                    9,
+                    "Data Analysis"
+                ],
+                [
+                    10,
+                    "Git and Github"
+                ]
             ]
         },
         {
@@ -168,7 +194,7 @@
             "name": "Skills_Wanted",
             "withoutRowId": false,
             "strict": false,
-            "ddl": "CREATE TABLE Skills_Wanted (id INTEGER PRIMARY KEY AUTOINCREMENT, User_id INTEGER NOT NULL REFERENCES Users (id) ON DELETE CASCADE, Skill_name varchar (100) NOT NULL)",
+            "ddl": "CREATE TABLE Skills_Wanted (id INTEGER PRIMARY KEY AUTOINCREMENT, Skill_name varchar (100) NOT NULL)",
             "columns": [
                 {
                     "name": "id",
@@ -177,20 +203,6 @@
                         {
                             "type": "PRIMARY KEY",
                             "definition": "PRIMARY KEY AUTOINCREMENT"
-                        }
-                    ]
-                },
-                {
-                    "name": "User_id",
-                    "type": "INTEGER",
-                    "constraints": [
-                        {
-                            "type": "NOT NULL",
-                            "definition": "NOT NULL "
-                        },
-                        {
-                            "type": "FOREIGN KEY",
-                            "definition": "REFERENCES Users (id) ON DELETE CASCADE"
                         }
                     ]
                 },
@@ -206,6 +218,46 @@
                 }
             ],
             "rows": [
+                [
+                    1,
+                    "Web Development"
+                ],
+                [
+                    2,
+                    "App Development"
+                ],
+                [
+                    3,
+                    "Python Programming"
+                ],
+                [
+                    4,
+                    "Java Programming"
+                ],
+                [
+                    5,
+                    "Database Management"
+                ],
+                [
+                    6,
+                    "Cybersecurity basics"
+                ],
+                [
+                    7,
+                    "DSA"
+                ],
+                [
+                    8,
+                    "Machine Learning"
+                ],
+                [
+                    9,
+                    "Data Analysis"
+                ],
+                [
+                    10,
+                    "Git and Github"
+                ]
             ]
         },
         {
@@ -296,7 +348,7 @@
             "name": "Users",
             "withoutRowId": false,
             "strict": false,
-            "ddl": "CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT, Name varchar (100) NOT NULL, Email varchar (100) UNIQUE NOT NULL, Password TEXT NOT NULL, Location varchar (100), Profile_photo TEXT, Privacy Boolean DEFAULT \"True\", Created_at TEXT DEFAULT (CURRENT_TIMESTAMP))",
+            "ddl": "CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT, Name varchar (100) NOT NULL, Email varchar (100) UNIQUE NOT NULL, Password TEXT NOT NULL, Location varchar (100), Profile_photo TEXT, Privacy Boolean DEFAULT \"True\", Created_at TEXT DEFAULT (CURRENT_TIMESTAMP), Skills_offered INTEGER REFERENCES Skills_Offered (id), Skills_wanted INTEGER REFERENCES Skills_Wanted (id))",
             "columns": [
                 {
                     "name": "id",
@@ -367,6 +419,26 @@
                         {
                             "type": "DEFAULT",
                             "definition": "DEFAULT (CURRENT_TIMESTAMP)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Skills_offered",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Skills_Offered (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Skills_wanted",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Skills_Wanted (id)"
                         }
                     ]
                 }
