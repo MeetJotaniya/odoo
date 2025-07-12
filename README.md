@@ -1,17 +1,14 @@
-# odoo
+# ✨ **Team Name: 404 Brain Not Found**
 
-Team Name : 404 Brain Not found
+## 💡 **Problem Statement - 1: Skill Swap Platform**
 
-problem statement -1 Skill Swap Platform
+---
 
-Name: Vidisha Bhagiya (Leader)
-Email: vidishabhagiya29@gmail.com
+### Team Members
 
-Name : Jotaniya Meet 
-Email : meetjotaniya07@gmail.com 
-
-Name : Yash virsodiya 
-Email: virsodiyayash4@gmail.com 
-
-Name : Ayushi Patel 
-Email: ayushipatel1229@gmail.com 
+| 👤 Name             | 📧 Email                        
+|--------------------|--------------------------------
+| **Vidisha Bhagiya** | vidishabhagiya29@gmail.com       
+| **Meet Jotaniya**   | meetjotaniya07@gmail.com       
+| **Yash Virsodiya**  | virsodiyayash4@gmail.com         
+| **Ayushi Patel**    | ayushipatel1229@gmail.com      
