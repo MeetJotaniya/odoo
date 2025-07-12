@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:odoo_try/views/profile/user_profile_screen.dart';
 import 'constants/colors.dart';
 import 'views/home_screen.dart';
 import '../login/login_view.dart';
