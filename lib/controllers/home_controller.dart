@@ -99,6 +99,28 @@ class HomeController {
         isPublic: true,
         rating: 4.2,
       ),
+      UserProfile(
+        id: 4,
+        name: 'Sarah Chen',
+        location: 'San Francisco',
+        profilePhotoUrl: null,
+        skillsOffered: ['Machine Learning', 'Data Analysis', 'Python'],
+        skillsWanted: ['UI/UX Design', 'Figma'],
+        availability: 'Weekdays',
+        isPublic: true,
+        rating: 4.9,
+      ),
+      UserProfile(
+        id: 5,
+        name: 'Alex Rodriguez',
+        location: 'Miami',
+        profilePhotoUrl: null,
+        skillsOffered: ['Spanish', 'Marketing', 'Social Media'],
+        skillsWanted: ['Web Development', 'JavaScript'],
+        availability: 'Evenings',
+        isPublic: true,
+        rating: 4.7,
+      ),
     ];
   }
 

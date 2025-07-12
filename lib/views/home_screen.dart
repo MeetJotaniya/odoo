@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final SwapService _swapService = SwapService();
   String _searchQuery = '';
   int _currentPage = 1;
-  final int _profilesPerPage = 2;
+  final int _profilesPerPage = 3;
 
   // Add a list to store added users (for demo)
   final List<UserProfile> _addedUsers = [];
@@ -234,13 +234,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   rating: 4.5, // Default rating
                 );
                 
-                // Navigate to profile page with smooth animation
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 400),
-                    pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
-                      opacity: animation,
-                      child: ProfileView(
+              // Navigate to profile page with smooth animation
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 400),
+                  pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                    opacity: animation,
+                    child: ProfileView(
                         profile: userProfile,
                         onSave: (updatedProfile) async {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -252,10 +252,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           await _loadProfiles();
                           setState(() {});
                         },
-                      ),
                     ),
                   ),
-                );
+                ),
+              );
               }
             },
           ),
