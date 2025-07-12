@@ -1,0 +1,88 @@
+{
+    "type": "table",
+    "database": null,
+    "name": "Users",
+    "withoutRowId": false,
+    "strict": false,
+    "ddl": "CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, Name varchar(100) NOT NULL, Email varchar(100) UNIQUE NOT NULL, Password TEXT NOT NULL, Location varchar(100), Profile_photo TEXT, Privacy Boolean DEFAULT \"True\", Created_at TIMESTRAP DEFAULT (CURRENT_TIMESTAMP));",
+    "columns": [
+        {
+            "name": "id",
+            "type": "INTEGER",
+            "constraints": [
+                {
+                    "type": "PRIMARY KEY",
+                    "definition": "PRIMARY KEY AUTOINCREMENT "
+                },
+                {
+                    "type": "UNIQUE",
+                    "definition": "UNIQUE"
+                }
+            ]
+        },
+        {
+            "name": "Name",
+            "type": "varchar",
+            "constraints": [
+                {
+                    "type": "NOT NULL",
+                    "definition": "NOT NULL"
+                }
+            ]
+        },
+        {
+            "name": "Email",
+            "type": "varchar",
+            "constraints": [
+                {
+                    "type": "UNIQUE",
+                    "definition": "UNIQUE "
+                },
+                {
+                    "type": "NOT NULL",
+                    "definition": "NOT NULL"
+                }
+            ]
+        },
+        {
+            "name": "Password",
+            "type": "TEXT",
+            "constraints": [
+                {
+                    "type": "NOT NULL",
+                    "definition": "NOT NULL"
+                }
+            ]
+        },
+        {
+            "name": "Location",
+            "type": "varchar"
+        },
+        {
+            "name": "Profile_photo",
+            "type": "TEXT"
+        },
+        {
+            "name": "Privacy",
+            "type": "Boolean",
+            "constraints": [
+                {
+                    "type": "DEFAULT",
+                    "definition": "DEFAULT \"True\""
+                }
+            ]
+        },
+        {
+            "name": "Created_at",
+            "type": "TIMESTRAP",
+            "constraints": [
+                {
+                    "type": "DEFAULT",
+                    "definition": "DEFAULT (CURRENT_TIMESTAMP)"
+                }
+            ]
+        }
+    ],
+    "rows": [
+    ]
+}
