@@ -26,7 +26,7 @@ class SkillSwapApp extends StatelessWidget {
           secondary: AppColors.secondary,
         ),
       ),
-      home: LoginScreen(),
+      home: HomeScreen(),
     );
   }
 }
