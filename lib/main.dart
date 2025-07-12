@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:odoo_try/views/profile/user_profile_screen.dart';
 import 'constants/colors.dart';
 import 'views/home_screen.dart';
-import '../login/login_view.dart';
+import 'views/auth/login_screen.dart';
 void main() {
   runApp(const SkillSwapApp());
 }
@@ -28,6 +28,10 @@ class SkillSwapApp extends StatelessWidget {
         ),
       ),
       home: HomeScreen(),
+      routes: {
+        '/home': (context) => HomeScreen(),
+        '/login': (context) => const LoginScreen(),
+      },
     );
   }
 }

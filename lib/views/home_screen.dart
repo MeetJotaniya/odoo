@@ -4,9 +4,11 @@ import 'package:odoo_try/views/widgets/search_bar.dart';
 import '../constants/colors.dart';
 import '../constants/text_styles.dart';
 import '../controllers/home_controller.dart';
+import '../services/auth_service.dart';
 import '../models/user_profile.dart';
 import 'widgets/profile_card.dart';
 import 'profile/profile_view.dart';
+import 'auth/login_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final HomeController _controller = HomeController();
+  final AuthService _authService = AuthService();
   String _searchQuery = '';
   int _currentPage = 1;
   final int _profilesPerPage = 2;
@@ -56,9 +59,71 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onRequest(UserProfile profile) {
-    // For now, just show a snackbar. Replace with request logic.
+    // Check if user is logged in
+    if (!_authService.checkLoginStatus()) {
+      // Show login dialog
+      _showLoginDialog();
+      return;
+    }
+    
+    // User is logged in, proceed with request
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Request sent to ${profile.name}')),
+    );
+  }
+
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Login Required',
+            style: AppTextStyles.heading.copyWith(color: AppColors.text),
+          ),
+          content: Text(
+            'You need to be logged in to send requests. Would you like to login now?',
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.text.withOpacity(0.7),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.text.withOpacity(0.7),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToLogin();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Login'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToLogin() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
     );
   }
 
@@ -71,6 +136,30 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         title: Text('Skill Swap Platform', style: AppTextStyles.heading.copyWith(color: Colors.white)),
         actions: [
+          // Login/Logout Button
+          IconButton(
+            icon: Icon(
+              _authService.checkLoginStatus() ? Icons.logout : Icons.login,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              if (_authService.checkLoginStatus()) {
+                // Logout
+                _authService.logout();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Logged out successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                // Navigate to login
+                _navigateToLogin();
+              }
+            },
+          ),
+          const SizedBox(width: 8),
+          // Profile Button
           IconButton(
             icon: const CircleAvatar(
               backgroundColor: Colors.white,
