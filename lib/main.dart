@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'constants/colors.dart';
 import 'views/home_screen.dart';
-
+import '../login/login_view.dart';
 void main() {
   runApp(const SkillSwapApp());
 }
@@ -26,7 +26,7 @@ class SkillSwapApp extends StatelessWidget {
           secondary: AppColors.secondary,
         ),
       ),
-      home: HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }
