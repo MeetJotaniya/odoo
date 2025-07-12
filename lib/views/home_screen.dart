@@ -5,6 +5,7 @@ import '../constants/text_styles.dart';
 import '../controllers/home_controller.dart';
 import '../models/user_profile.dart';
 import 'widgets/profile_card.dart';
+import 'profile/profile_view.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -62,9 +63,17 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.person, color: AppColors.primary),
             ),
             onPressed: () {
-              // Navigate to profile page (to be implemented)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile icon tapped')),
+              // Navigate to profile page with smooth animation
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 400),
+                  pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                    opacity: animation,
+                    child: ProfileView(
+                      profile: _controller.allProfiles.first, // Use the first profile as mock
+                    ),
+                  ),
+                ),
               );
             },
           ),
