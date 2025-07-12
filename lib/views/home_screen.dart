@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:odoo_try/views/profile/user_profile_screen.dart';
 import 'package:odoo_try/views/widgets/search_bar.dart';
 import '../constants/colors.dart';
 import '../constants/text_styles.dart';
 import '../controllers/home_controller.dart';
 import '../models/user_profile.dart';
 import 'widgets/profile_card.dart';
+import 'profile/profile_view.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +37,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onProfileTap(UserProfile profile) {
     // For now, just show a snackbar. Replace with navigation to profile details.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserProfileScreen(
+          userName: 'Marc Demo',
+          skillsOffered: ['Flutter', 'Dart', 'UI Design'],
+          skillsWanted: ['Python', 'Machine Learning'],
+          rating: 4.8,
+          feedbackCount: 23,
+          profileImageUrl: 'https://i.pravatar.cc/150?img=3',
+        ),
+      ),
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Tapped on ${profile.name}')),
     );
@@ -62,9 +77,17 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.person, color: AppColors.primary),
             ),
             onPressed: () {
-              // Navigate to profile page (to be implemented)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile icon tapped')),
+              // Navigate to profile page with smooth animation
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 400),
+                  pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                    opacity: animation,
+                    child: ProfileView(
+                      profile: _controller.allProfiles.first, // Use the first profile as mock
+                    ),
+                  ),
+                ),
               );
             },
           ),

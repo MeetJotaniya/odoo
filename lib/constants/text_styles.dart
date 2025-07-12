@@ -30,4 +30,4 @@ class AppTextStyles {
     color: Colors.white,
     fontWeight: FontWeight.bold,
   );
-} 
+}

@@ -1,0 +1,458 @@
+{
+    "type": "database",
+    "name": "Oddo",
+    "objects": [
+        {
+            "type": "table",
+            "database": null,
+            "name": "Admin_Action",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE Admin_Action (id INTEGER PRIMARY KEY AUTOINCREMENT, Admin_id INTEGER NOT NULL REFERENCES Users (id), Target_user_id INTEGER, Description TEXT, Created_at TEXT DEFAULT (CURRENT_TIMESTAMP), Action_type varchar(50))",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "Admin_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Users (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Target_user_id",
+                    "type": "INTEGER"
+                },
+                {
+                    "name": "Description",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "Created_at",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "DEFAULT",
+                            "definition": "DEFAULT (CURRENT_TIMESTAMP)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Action_type",
+                    "type": "varchar"
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "Availibilty",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE Availibilty (id INTEGER PRIMARY KEY AUTOINCREMENT, User_id INTEGER NOT NULL REFERENCES Users (id) ON DELETE CASCADE, Day TEXT CHECK (Day IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')), Time_slot TEXT CHECK (Time_slot IN ('Morning', 'Afternoon', 'Evening')))",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "User_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Users (id) ON DELETE CASCADE"
+                        }
+                    ]
+                },
+                {
+                    "name": "Day",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (Day IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'))"
+                        }
+                    ]
+                },
+                {
+                    "name": "Time_slot",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (Time_slot IN ('Morning', 'Afternoon', 'Evening'))"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "Skills_Offered",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE Skills_Offered (id INTEGER PRIMARY KEY AUTOINCREMENT, skill_name varchar (100) NOT NULL)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "skill_name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "Web Development"
+                ],
+                [
+                    2,
+                    "App Development"
+                ],
+                [
+                    3,
+                    "Python Programming"
+                ],
+                [
+                    4,
+                    "Java Programming"
+                ],
+                [
+                    5,
+                    "Database Management"
+                ],
+                [
+                    6,
+                    "Cybersecurity Basis"
+                ],
+                [
+                    7,
+                    "DSA"
+                ],
+                [
+                    8,
+                    "Machine Learning"
+                ],
+                [
+                    9,
+                    "Data Analysis"
+                ],
+                [
+                    10,
+                    "Git and Github"
+                ],
+                [
+                    11,
+                    "Excel,powerpoint and word"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "Skills_Wanted",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE Skills_Wanted (id INTEGER PRIMARY KEY AUTOINCREMENT, Skill_name varchar (100) NOT NULL)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "Skill_name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+                [
+                    1,
+                    "Web Development"
+                ],
+                [
+                    2,
+                    "App Development"
+                ],
+                [
+                    3,
+                    "Python Programming"
+                ],
+                [
+                    4,
+                    "Java Programming"
+                ],
+                [
+                    5,
+                    "Database Management"
+                ],
+                [
+                    6,
+                    "Cybersecurity basics"
+                ],
+                [
+                    7,
+                    "DSA"
+                ],
+                [
+                    8,
+                    "Machine Learning"
+                ],
+                [
+                    9,
+                    "Data Analysis"
+                ],
+                [
+                    10,
+                    "Git and Github"
+                ],
+                [
+                    11,
+                    "Excel,powerpoint and word"
+                ]
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "SwapRequests",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE SwapRequests (id INTEGER PRIMARY KEY AUTOINCREMENT, From_user_id INTEGER REFERENCES Users (id) ON DELETE CASCADE, To_user_id INTEGER REFERENCES Users (id) ON DELETE CASCADE, Offered_skiils varchar (100) NOT NULL, Requested_skills varchar (100) NOT NULL, Status TEXT CHECK (Status IN ('pending', 'accepted', 'rejected', 'cancelled')), Created_at TEXT DEFAULT (CURRENT_TIMESTAMP))",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "From_user_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Users (id) ON DELETE CASCADE"
+                        }
+                    ]
+                },
+                {
+                    "name": "To_user_id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Users (id) ON DELETE CASCADE"
+                        }
+                    ]
+                },
+                {
+                    "name": "Offered_skiils",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "Requested_skills",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "Status",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (Status IN ('pending', 'accepted', 'rejected', 'cancelled'))"
+                        }
+                    ]
+                },
+                {
+                    "name": "Created_at",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "DEFAULT",
+                            "definition": "DEFAULT (CURRENT_TIMESTAMP)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "Users",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT, Name varchar (100) NOT NULL, Email varchar (100) UNIQUE NOT NULL, Password TEXT NOT NULL, Location varchar (100), Profile_photo TEXT, Privacy Boolean DEFAULT \"True\", Created_at TEXT DEFAULT (CURRENT_TIMESTAMP), Skills_offered INTEGER REFERENCES Skills_Offered (id), Skills_wanted INTEGER REFERENCES Skills_Wanted (id))",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "Name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "Email",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "UNIQUE",
+                            "definition": "UNIQUE "
+                        },
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "Password",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "Location",
+                    "type": "varchar"
+                },
+                {
+                    "name": "Profile_photo",
+                    "type": "TEXT"
+                },
+                {
+                    "name": "Privacy",
+                    "type": "Boolean",
+                    "constraints": [
+                        {
+                            "type": "DEFAULT",
+                            "definition": "DEFAULT \"True\""
+                        }
+                    ]
+                },
+                {
+                    "name": "Created_at",
+                    "type": "TEXT",
+                    "constraints": [
+                        {
+                            "type": "DEFAULT",
+                            "definition": "DEFAULT (CURRENT_TIMESTAMP)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Skills_offered",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Skills_Offered (id)"
+                        }
+                    ]
+                },
+                {
+                    "name": "Skills_wanted",
+                    "type": "INTEGER",
+                    "constraints": [
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES Skills_Wanted (id)"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        }
+    ]
+}
